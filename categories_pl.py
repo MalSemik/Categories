@@ -20,15 +20,20 @@ def get_answers(letter, categories):
     for category in categories:
         answer = input(f'{category} na literę {letter}: ')
         answers.append(answer)
-    print(answers)
+    return answers
 
 
 def check_answers(answers, letter):
     for i in range(len(answers)):
         if answers[i][0].lower() != letter:
             answers[i] = '-'
-    print(answers)
+    return answers
 
 
-get_answers(letter, categories)
-check_answers(['gu', 'ge', 'lg'], 'g')
+answers = get_answers(letter, categories)
+check_answers(answers, letter)
+
+# Create and update player_sheet
+player_sheet = PrettyTable(categories)
+player_sheet.add_row(answers)
+print(player_sheet)

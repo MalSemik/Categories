@@ -1,5 +1,3 @@
-import time
-import sys
 import random
 from prettytable import PrettyTable
 

@@ -4,7 +4,7 @@ from prettytable import PrettyTable
 alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'ł', 'm', 'n', 'o', 'p', 'r', 's', 't', 'u',
             'w', 'z']
 random.shuffle(alphabet)
-letter = alphabet.pop()
+
 categories = ['Państwo', 'Miasto', 'Roślina', 'Zwierzę', 'Imię', 'Rzecz']
 
 
@@ -18,24 +18,15 @@ def get_answers(letter, categories):
 
 def check_answers(answers, letter):
     for i in range(len(answers)):
-        if answers[i][0].lower() != letter:
+        if len(answers[i]) == 0 or answers[i][0].lower() != letter:
             answers[i] = '-'
     return answers
 
 
-# answers = get_answers(letter, categories)
-# check_answers(answers, letter)
-
-# Create and update player_sheet
-player_sheet = PrettyTable(categories)
-# player_sheet.add_row(answers)
-# print(player_sheet)
-
-
 class Player:
-    def __init__(self, name, player_sheet):
+    def __init__(self, name):
         self.name = name
-        self.sheet = player_sheet
+        self.sheet = PrettyTable(categories)
         self.points = 0
 
 
@@ -44,13 +35,36 @@ def setup():
     players = {}
     for i in range(num_players):
         name = input(f"Podaj imię gracza numer {i+1}: ")
-        players.update({name: Player(name, player_sheet)})
-    print(players)
+        players.update({name: Player(name)})
+    return players
+
+
+def single_game(alphabet, players):
+    letter = alphabet.pop()
+    for player in players.values():
+        print(f"Odpowiada {player.name}")
+        answers = get_answers(letter, categories)
+        answers = check_answers(answers, letter)
+        player.sheet.add_row(answers)
+        print(player.sheet)
+    # score the game
 
 
 def main():
     print("Witamy w grze Państwa-Miasta!")
-    setup()
+    players = setup()
+    print("Wszyscy gotowi? Więc zaczynamy!")
+    single_game(alphabet, players)
+    while len(alphabet) > 0:
+        play_again = input("Czy chcesz zagrać jeszcze raz? (Y/N) ").upper()
+        if play_again == "Y":
+            single_game(alphabet, players)
+        else:
+            print("Dziękujemy za wspólną grę!")
+            print("Wygrywa ZWYCIĘZCA")
+            return
+    print("Nie ma już więcej liter.")
+    print("Wygrywa ZWYCIĘZCA")
 
 
 main()

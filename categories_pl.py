@@ -23,10 +23,16 @@ def check_answers(answers, letter):
     return answers
 
 
+def print_sheet(categories, answers):
+    player_sheet = PrettyTable(categories)
+    player_sheet.add_rows(answers)
+    print(player_sheet)
+
+
 class Player:
     def __init__(self, name):
         self.name = name
-        self.sheet = PrettyTable(categories)
+        self.answer_sheet = []
         self.points = 0
 
 
@@ -45,8 +51,8 @@ def single_game(alphabet, players):
         print(f"Odpowiada {player.name}")
         answers = get_answers(letter, categories)
         answers = check_answers(answers, letter)
-        player.sheet.add_row(answers)
-        print(player.sheet)
+        player.answer_sheet.append(answers)
+        print(player.answer_sheet)
     # score the game
 
 

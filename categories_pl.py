@@ -1,5 +1,7 @@
 import random
+from collections import Counter
 from prettytable import PrettyTable
+
 
 alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'ł', 'm', 'n', 'o', 'p', 'r', 's', 't', 'u',
             'w', 'z']
@@ -21,6 +23,37 @@ def check_answers(answers, letter):
         if len(answers[i]) == 0 or answers[i][0].lower() != letter:
             answers[i] = '-'
     return answers
+
+
+def score_answers(players):
+    latest_answers = [player.answer_sheet[-1] for player in players.values()]
+    print(latest_answers)
+    categories = [[latest_answers[j][i] for j in range(len(latest_answers))] for i in range(len(latest_answers[0]))]
+
+    for category in categories:
+        count = Counter(list(category))
+        for i in range(len(category)):
+            if category[i] == '-':
+                category[i] = 0
+            elif count[category[i]] > 1:
+                category[i] = 5
+            elif count['-'] == len(category) - 1:
+                category[i] = 15
+            else:
+                category[i] = 10
+
+    print(categories)
+
+    results = [sum([categories[j][i] for j in range(len(categories))]) for i in range(len(categories[0]))]
+
+    print(results)
+
+    for player in players.values():
+        player.points = player.points + results[0]
+        results.pop(0)
+
+    for player in players.values():
+        print(f'{player.name} ma {player.points} pkt.' )
 
 
 def print_sheet(categories, answers):
@@ -53,7 +86,7 @@ def single_game(alphabet, players):
         answers = check_answers(answers, letter)
         player.answer_sheet.append(answers)
         print(player.answer_sheet)
-    # score the game
+    score_answers(players)
 
 
 def main():

@@ -28,7 +28,7 @@ def check_answers(answers, letter):
 def score_answers(players):
     latest_answers = [player.answer_sheet[-1] for player in players.values()]
     print(latest_answers)
-    categories = [[latest_answers[j][i] for j in range(len(latest_answers))] for i in range(len(latest_answers[0]))]
+    categories = [[latest_answers[j][i].lower() for j in range(len(latest_answers))] for i in range(len(latest_answers[0]))]
 
     for category in categories:
         count = Counter(list(category))
@@ -85,7 +85,7 @@ def single_game(alphabet, players):
         answers = get_answers(letter, categories)
         answers = check_answers(answers, letter)
         player.answer_sheet.append(answers)
-        print(player.answer_sheet)
+        print_sheet(categories, player.answer_sheet)
     score_answers(players)
 
 

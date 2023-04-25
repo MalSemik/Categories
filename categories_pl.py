@@ -1,3 +1,4 @@
+import os
 import random
 from collections import Counter
 from prettytable import PrettyTable
@@ -27,7 +28,6 @@ def check_answers(answers, letter):
 
 def score_answers(players):
     latest_answers = [player.answer_sheet[-1] for player in players.values()]
-    print(latest_answers)
     categories = [[latest_answers[j][i].lower() for j in range(len(latest_answers))] for i in range(len(latest_answers[0]))]
 
     for category in categories:
@@ -42,11 +42,7 @@ def score_answers(players):
             else:
                 category[i] = 10
 
-    print(categories)
-
     results = [sum([categories[j][i] for j in range(len(categories))]) for i in range(len(categories[0]))]
-
-    print(results)
 
     for player in players.values():
         player.points = player.points + results[0]
@@ -69,8 +65,6 @@ def check_winner(players):
         for player in players.values():
             if player.points == max_points:
                 print(f"{player.name} zwycięża z liczbą {player.points} punktów.")
-
-
 
 
 def print_sheet(categories, answers):
@@ -103,6 +97,7 @@ def single_game(alphabet, players):
         answers = check_answers(answers, letter)
         player.answer_sheet.append(answers)
         print_sheet(categories, player.answer_sheet)
+        os.system('cls')
     score_answers(players)
 
 
@@ -124,3 +119,4 @@ def main():
 
 
 main()
+input("")

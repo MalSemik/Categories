@@ -56,6 +56,23 @@ def score_answers(players):
         print(f'{player.name} ma {player.points} pkt.' )
 
 
+def check_winner(players):
+    points = [player.points for player in players.values()]
+    max_points = max(points)
+    if points.count(max_points) > 1:
+        draws = []
+        for player in players.values():
+            if player.points == max_points:
+                draws.append(player.name)
+        print(f"Gracze {draws} remisują z liczbą {max_points} punktów.")
+    else:
+        for player in players.values():
+            if player.points == max_points:
+                print(f"{player.name} zwycięża z liczbą {player.points} punktów.")
+
+
+
+
 def print_sheet(categories, answers):
     player_sheet = PrettyTable(categories)
     player_sheet.add_rows(answers)
@@ -100,10 +117,10 @@ def main():
             single_game(alphabet, players)
         else:
             print("Dziękujemy za wspólną grę!")
-            print("Wygrywa ZWYCIĘZCA")
+            check_winner(players)
             return
     print("Nie ma już więcej liter.")
-    print("Wygrywa ZWYCIĘZCA")
+    check_winner(players)
 
 
 main()

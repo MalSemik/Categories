@@ -1,12 +1,13 @@
 import os
 import random
+from sys import platform
 from collections import Counter
-from prettytable import PrettyTable
+# from prettytable import PrettyTable
 
 
-alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'ł', 'm', 'n', 'o', 'p', 'r', 's', 't', 'u',
+possible_letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'ł', 'm', 'n', 'o', 'p', 'r', 's', 't', 'u',
             'w', 'z']
-random.shuffle(alphabet)
+random.shuffle(possible_letters)
 
 categories = ['Państwo', 'Miasto', 'Roślina', 'Zwierzę', 'Imię', 'Rzecz']
 
@@ -15,7 +16,7 @@ def get_answers(letter, categories):
     answers = []
     for category in categories:
         answer = input(f'{category} na literę {letter}: ')
-        answers.append(answer)
+        answers.append(answer.capitalize())
     return answers
 
 
@@ -26,45 +27,59 @@ def check_answers(answers, letter):
     return answers
 
 
-def score_answers(players):
-    latest_answers = [player.answer_sheet[-1] for player in players.values()]
-    categories = [[latest_answers[j][i].lower() for j in range(len(latest_answers))] for i in range(len(latest_answers[0]))]
+def group_by_categories(players_answers_last_round):
+    """
+    >>> group_by_categories([["Polska", "Poznan"], ["Pakistan", "Pcim"]])
+    [('Polska', 'Pakistan'), ('Poznan', 'Pcim')]
+    """
+    return list(zip(*players_answers_last_round))
 
-    for category in categories:
+
+def score_answers(players_by_name):
+    players_answers_last_round = [player.answer_sheet[-1] for player in players_by_name.values()]
+    category_answers = group_by_categories(players_answers_last_round)
+
+    all_scores = []
+    for category in category_answers:
         count = Counter(list(category))
+        score = []
         for i in range(len(category)):
             if category[i] == '-':
-                category[i] = 0
+                score.append(0)
             elif count[category[i]] > 1:
-                category[i] = 5
+                score.append(5)
             elif count['-'] == len(category) - 1:
-                category[i] = 15
+                score.append(15)
             else:
-                category[i] = 10
+                score.append(10)
+        all_scores.append(score)
 
-    results = [sum([categories[j][i] for j in range(len(categories))]) for i in range(len(categories[0]))]
+    players_round_scores = list(zip(*all_scores))
+    sums_of_scores = []
+    for player_round_scores in players_round_scores:
+        sums_of_scores.append(sum(list(player_round_scores)))
 
-    for player in players.values():
-        player.points = player.points + results[0]
-        results.pop(0)
+    for player, points in zip(players_by_name.values(), sums_of_scores):
+        player.points += points
 
-    for player in players.values():
+    for player in players_by_name.values():
         print(f'{player.name} ma {player.points} pkt.' )
 
 
-def check_winner(players):
-    points = [player.points for player in players.values()]
+def check_winner(players_by_name):
+    points = [player.points for player in players_by_name.values()]
     max_points = max(points)
     if points.count(max_points) > 1:
         draws = []
-        for player in players.values():
+        for player in players_by_name.values():
             if player.points == max_points:
-                draws.append(player.name)
-        print(f"Gracze {draws} remisują z liczbą {max_points} punktów.")
+                draws.append(player)
+        return draws
+
     else:
-        for player in players.values():
+        for player in players_by_name.values():
             if player.points == max_points:
-                print(f"{player.name} zwycięża z liczbą {player.points} punktów.")
+                return player
 
 
 def print_sheet(categories, answers):
@@ -82,41 +97,54 @@ class Player:
 
 def setup():
     num_players = int(input("Ilu graczy będzie brało udział w rozgrywce? "))
-    players = {}
+    players_by_name = {}
     for i in range(num_players):
         name = input(f"Podaj imię gracza numer {i+1}: ")
-        players.update({name: Player(name)})
-    return players
+        players_by_name.update({name: Player(name)})
+    return players_by_name
 
 
-def single_game(alphabet, players):
+def single_game(alphabet, players_by_name):
     letter = alphabet.pop()
-    for player in players.values():
+    for player in players_by_name.values():
         print(f"Odpowiada {player.name}")
         answers = get_answers(letter, categories)
         answers = check_answers(answers, letter)
         player.answer_sheet.append(answers)
-        print_sheet(categories, player.answer_sheet)
-        os.system('cls')
-    score_answers(players)
+        # print_sheet(categories, player.answer_sheet)
+        if platform == "win32":
+            os.system('cls')
+        else:
+            os.system('clear')
+    score_answers(players_by_name)
 
 
 def main():
     print("Witamy w grze Państwa-Miasta!")
-    players = setup()
+    players_by_name = setup()
     print("Wszyscy gotowi? Więc zaczynamy!")
-    single_game(alphabet, players)
-    while len(alphabet) > 0:
+    single_game(possible_letters, players_by_name)
+    while len(possible_letters) > 0:
         play_again = input("Czy chcesz zagrać jeszcze raz? (Y/N) ").upper()
         if play_again == "Y":
-            single_game(alphabet, players)
+            single_game(possible_letters, players_by_name)
         else:
             print("Dziękujemy za wspólną grę!")
-            check_winner(players)
+            winner = check_winner(players_by_name)
+            if isinstance(winner, list):
+                names = [player.name for player in winner]
+                print(f"Gracze {', '.join(names)} remisują z liczbą {winner[0].points} punktów.")
+            else:
+                print(f"{winner.name} zwycięża z liczbą {winner.points} punktów.")
             return
     print("Nie ma już więcej liter.")
-    check_winner(players)
+    winner = check_winner(players_by_name)
+    if isinstance(winner, list):
+        names = [player.name for player in winner]
+        print(f"Gracze {', '.join(names)} remisują z liczbą {winner[0].points} punktów.")
+    else:
+        print(f"{winner.name} zwycięża z liczbą {winner.points} punktów.")
 
 
 main()
-input("")
+input("Naciśnij dowolny przycisk aby zakończyć.")

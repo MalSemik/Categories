@@ -170,5 +170,6 @@ def main():
         print(f"{winner.name} zwycięża z liczbą {winner.points} punktów.")
 
 
-main()
-input("Naciśnij dowolny przycisk aby zakończyć.")
+if __name__ == "__main__":
+    main()
+    input("Naciśnij dowolny przycisk aby zakończyć.")

@@ -131,7 +131,7 @@ def setup():
 def single_game(alphabet, players_by_name):
     letter = alphabet.pop()
     for player in players_by_name.values():
-        print(f"Odpowiada {player.name}")
+        print(f"Odpowiada {player.name}. Litera {letter}")
         answers = get_answers(letter, categories)
         answers = check_answers(answers, letter)
         player.answer_sheet.append(answers)

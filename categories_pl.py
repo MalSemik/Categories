@@ -2,20 +2,44 @@ import os
 import random
 from sys import platform
 from collections import Counter
-# from prettytable import PrettyTable
+
+from prettytable import PrettyTable
 
 
-possible_letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'ł', 'm', 'n', 'o', 'p', 'r', 's', 't', 'u',
-            'w', 'z']
+possible_letters = [
+    "a",
+    "b",
+    "c",
+    "d",
+    "e",
+    "f",
+    "g",
+    "h",
+    "i",
+    "j",
+    "k",
+    "l",
+    "ł",
+    "m",
+    "n",
+    "o",
+    "p",
+    "r",
+    "s",
+    "t",
+    "u",
+    "w",
+    "z",
+]
 random.shuffle(possible_letters)
 
-categories = ['Państwo', 'Miasto', 'Roślina', 'Zwierzę', 'Imię', 'Rzecz']
+categories = ["Państwo", "Miasto", "Roślina", "Zwierzę", "Imię", "Rzecz"]
 
 
 def get_answers(letter, categories):
     answers = []
     for category in categories:
-        answer = input(f'{category} na literę {letter}: ')
+        answer = input(f"{category} na literę {letter}: ")
         answers.append(answer.capitalize())
     return answers
 
@@ -23,7 +47,7 @@ def get_answers(letter, categories):
 def check_answers(answers, letter):
     for i in range(len(answers)):
         if len(answers[i]) == 0 or answers[i][0].lower() != letter:
-            answers[i] = '-'
+            answers[i] = "-"
     return answers
 
 
@@ -44,11 +68,11 @@ def score_answers(players_by_name):
         count = Counter(list(category))
         score = []
         for i in range(len(category)):
-            if category[i] == '-':
+            if category[i] == "-":
                 score.append(0)
             elif count[category[i]] > 1:
                 score.append(5)
-            elif count['-'] == len(category) - 1:
+            elif count["-"] == len(category) - 1:
                 score.append(15)
             else:
                 score.append(10)
@@ -63,7 +87,7 @@ def score_answers(players_by_name):
         player.points += points
 
     for player in players_by_name.values():
-        print(f'{player.name} ma {player.points} pkt.' )
+        print(f"{player.name} ma {player.points} pkt.")
 
 
 def check_winner(players_by_name):
@@ -107,15 +131,15 @@ def setup():
 def single_game(alphabet, players_by_name):
     letter = alphabet.pop()
     for player in players_by_name.values():
-        print(f"Odpowiada {player.name}")
+        print(f"Odpowiada {player.name}. Litera {letter}")
         answers = get_answers(letter, categories)
         answers = check_answers(answers, letter)
         player.answer_sheet.append(answers)
         # print_sheet(categories, player.answer_sheet)
         if platform == "win32":
-            os.system('cls')
+            os.system("cls")
         else:
-            os.system('clear')
+            os.system("clear")
     score_answers(players_by_name)
 
 
@@ -146,5 +170,6 @@ def main():
         print(f"{winner.name} zwycięża z liczbą {winner.points} punktów.")
 
 
-main()
-input("Naciśnij dowolny przycisk aby zakończyć.")
+if __name__ == "__main__":
+    main()
+    input("Naciśnij dowolny przycisk aby zakończyć.")

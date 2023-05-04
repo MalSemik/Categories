@@ -6,7 +6,8 @@ import io
 
 
 @patch("builtins.input")
-@patch.object(categories_pl, "possible_letters", ["a", "p"])  # possible_letters are sorted before the test, so we get p
+# possible_letters are shuffled before the test, and popped later, so this forces the game to give us p
+@patch.object(categories_pl, "possible_letters", ["a", "p"])
 def test_system_happy_path(input_mock):
     user_inputs = [
         # how many players?

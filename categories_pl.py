@@ -3,7 +3,7 @@ import random
 from sys import platform
 from collections import Counter
 
-from prettytable import PrettyTable
+# from prettytable import PrettyTable
 
 
 possible_letters = [
